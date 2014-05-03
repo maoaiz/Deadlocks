@@ -1,7 +1,7 @@
 MAX = [9, 3, 6]
 
 
-class Bank:
+class Deadlock:
     def __init__(self, needed, assigned):
         self.max = MAX
         self.needed = needed
@@ -41,13 +41,11 @@ class Bank:
             res.append(self.max[j] - tmp)
         return res
 
-
     def is_secure(self):
         pass
 
-
     def get_resources(self, request, index):
-        """retorna estados:
+        """status returned:
             0 = Error de solicitud exagerada
             1 = suspender proceso
         """
@@ -83,5 +81,5 @@ if __name__ == "__main__":
         [2, 1, 1],
         [0, 0, 2]
     ]
-    b = Bank(needed, assigned)
+    b = Deadlock(needed, assigned)
     b.run()
