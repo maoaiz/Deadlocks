@@ -6,7 +6,7 @@ class Deadlock:
         self.max = MAX
         self.needed = needed
         self.assigned = assigned
-        self.finished = len(assigned)
+        self.finished = [False]*len(assigned)
         self.requests = self.calc_requests()
         self.available = self.calc_available()
 
@@ -42,7 +42,20 @@ class Deadlock:
         return res
 
     def is_secure(self):
-        pass
+        job = []
+        for j in self.available:
+            job.append(j)
+        for i in range(len(self.finished)):
+            if self.finished[i] == False and self.needed[i] <= job
+                job = self.sum(job, self.assigned[i])
+                self.finished[i] = True
+                i += 1
+        is_secure = True
+        for i in range(len(self.finished)):
+            if self.finished[i] == False:
+                is_secure = False
+                break
+        return is_secure
 
     def get_resources(self, request, index):
         """status returned:
@@ -59,12 +72,13 @@ class Deadlock:
             self.assigned = self.sum(self.assigned, request)
             self.needed = self.difference(self.needed, request)
             if self.is_secure():
-                pass
+                print "ES SEGURO"
             else:
-                pass
+                print "NO ES SEGURO"
 
     def run(self):
-        pass
+        for i, pi in enumerate(self.requests): 
+            self.get_resources(pi, i)
 
 
 
