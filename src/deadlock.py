@@ -11,6 +11,8 @@ class Deadlock:
         self.available = self.calc_available()
 
     def difference(self, a, b):
+        """Retorna una matriz con la resta de los elementos de dos matrices"""
+        print a, " - ", b
         res = []
         for i in range(len(a)):
             tmp = []
@@ -20,12 +22,11 @@ class Deadlock:
         return res
 
     def sum(self, a, b):
+        """Retorna una lista con la suma de los elementos de dos listas"""
         res = []
-        for i in range(len(a)):
-            tmp = []
-            for j in range(len(a[i])):
-                tmp.append(a[i][j]+b[i][j])
-            res.append(tmp)
+        if len(a) == len(b):
+            for i in range(len(a)):
+                res.append(a[i] + b[i])
         return res
 
     def calc_requests(self):
@@ -46,7 +47,7 @@ class Deadlock:
         for j in self.available:
             job.append(j)
         for i in range(len(self.finished)):
-            if self.finished[i] == False and self.needed[i] <= job
+            if self.finished[i] == False and self.needed[i] <= job:
                 job = self.sum(job, self.assigned[i])
                 self.finished[i] = True
                 i += 1
@@ -66,19 +67,28 @@ class Deadlock:
             print "[ERROR] Se estan solicitando mas recursos de los necesarios\n"
             return 0
         if request > self.available:
+            print "No se puede satisfacer. proceso en espera", request
             return 1
         else:
-            self.available = self.difference(self.available, request)
-            self.assigned = self.sum(self.assigned, request)
-            self.needed = self.difference(self.needed, request)
+            self.available = self.difference([self.available], [request])[0]
+            self.assigned[index] = self.sum(self.assigned[index], request)
+            self.needed[index] = self.difference([self.needed[index]], [request])
+            print "Las variables han sido modificadas"
             if self.is_secure():
-                print "ES SEGURO"
+                print "ES SEGURO", request
+                return 2
             else:
-                print "NO ES SEGURO"
+                print "NO ES SEGURO", request
+                return 3
 
     def run(self):
         for i, pi in enumerate(self.requests): 
-            self.get_resources(pi, i)
+            print self.get_resources(pi, i)
+            print "self.available", self.available
+            print "self.needed", self.needed
+            print "self.assigned", self.assigned
+            print "self.requests", self.requests
+            #break
 
 
 
