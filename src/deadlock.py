@@ -12,7 +12,6 @@ class Deadlock:
 
     def difference(self, a, b):
         """Retorna una matriz con la resta de los elementos de dos matrices"""
-        print a, " - ", b
         res = []
         for i in range(len(a)):
             tmp = []
@@ -43,11 +42,9 @@ class Deadlock:
         return res
 
     def is_secure(self):
-        job = []
-        for j in self.available:
-            job.append(j)
+        job = [j for j in self.available]
         for i in range(len(self.finished)):
-            if self.finished[i] == False and self.needed[i] <= job:
+            if self.finished[i] == False and self.requests[i] <= job:
                 job = self.sum(job, self.assigned[i])
                 self.finished[i] = True
                 i += 1
@@ -62,33 +59,48 @@ class Deadlock:
         """status returned:
             0 = Error de solicitud exagerada
             1 = suspender proceso
-        """
+            2 = dar recursos
+            3 = recuperar estado previo"""
         if request > self.needed[index]:
             print "[ERROR] Se estan solicitando mas recursos de los necesarios\n"
             return 0
         if request > self.available:
-            print "No se puede satisfacer. proceso en espera", request
-            return 1
+            # print "No se puede satisfacer. proceso en espera", request
+            return "[proceso: %s, no se puede satisfacer la peticion %s]" % (self.needed[index], request)
         else:
-            self.available = self.difference([self.available], [request])[0]
             self.assigned[index] = self.sum(self.assigned[index], request)
-            self.needed[index] = self.difference([self.needed[index]], [request])
-            print "Las variables han sido modificadas"
+            self.available = self.difference([self.available], [request])[0]
+            # self.needed[index] = self.difference([self.needed[index]], [request])
+            self.requests[index] = [0]*len(request)
+
             if self.is_secure():
                 print "ES SEGURO", request
                 return 2
             else:
-                print "NO ES SEGURO", request
+                self.available = self.sum(self.available, self.assigned[index])
+                self.assigned[index] = [0]*len(request)
                 return 3
 
+    def print_matrixes(self):
+        print "Needed\t\tAssigned\trequested"
+        for idx in range(len(self.needed)):
+            print "%s\t%s\t%s" % (self.needed[idx],self.assigned[idx], self.requests[idx])
+        print
+        print "Total: %s\tAvailable: %s\n\n" % (self.max, self.available)
+
     def run(self):
-        for i, pi in enumerate(self.requests): 
-            print self.get_resources(pi, i)
-            print "self.available", self.available
-            print "self.needed", self.needed
-            print "self.assigned", self.assigned
-            print "self.requests", self.requests
-            #break
+        band = True
+        while band:
+            for i, pi in enumerate(self.requests): 
+                ans = self.get_resources(pi, i)
+                self.print_matrixes()
+                if ans == 3:
+                    # print "volver a empezar"
+                    break
+                elif ans == 2:
+                    band = False
+                    break
+        print "\n\nEstado SEGURO"
 
 
 
