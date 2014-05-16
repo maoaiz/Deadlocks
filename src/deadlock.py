@@ -41,10 +41,16 @@ class Deadlock:
             res.append(self.max[j] - tmp)
         return res
 
-    def is_secure(self):
+    def is_secure(self, i):
         job = [j for j in self.available]
+        # job = self.sum(job, self.assigned[i])
+        print job
+        # job = self.available
         for i in range(len(self.finished)):
+            # print self.needed[i]
+            # print job
             if self.finished[i] == False and self.requests[i] <= job:
+            # if self.finished[i] == False and self.needed[i] <= self.assigned[i]:
                 job = self.sum(job, self.assigned[i])
                 self.finished[i] = True
                 i += 1
@@ -53,6 +59,7 @@ class Deadlock:
             if self.finished[i] == False:
                 is_secure = False
                 break
+        print self.finished
         return is_secure
 
     def get_resources(self, request, index):
@@ -65,20 +72,23 @@ class Deadlock:
             print "[ERROR] Se estan solicitando mas recursos de los necesarios\n"
             return 0
         if request > self.available:
-            # print "No se puede satisfacer. proceso en espera", request
-            return "[proceso: %s, no se puede satisfacer la peticion %s]" % (self.needed[index], request)
+            print "[proceso: %s, no se puede satisfacer la peticion %s]" % (self.needed[index], request)
+            return 1
         else:
             self.assigned[index] = self.sum(self.assigned[index], request)
             self.available = self.difference([self.available], [request])[0]
             # self.needed[index] = self.difference([self.needed[index]], [request])
             self.requests[index] = [0]*len(request)
 
-            if self.is_secure():
+            if self.is_secure(index):
                 print "ES SEGURO", request
                 return 2
             else:
-                self.available = self.sum(self.available, self.assigned[index])
-                self.assigned[index] = [0]*len(request)
+                print self.available
+                # self.print_matrixes()
+                # raise Exception
+                # self.available = self.sum(self.available, self.assigned[index])
+                # self.assigned[index] = [0]*len(request)
                 return 3
 
     def print_matrixes(self):
@@ -90,16 +100,20 @@ class Deadlock:
 
     def run(self):
         band = True
-        while band:
-            for i, pi in enumerate(self.requests): 
-                ans = self.get_resources(pi, i)
-                self.print_matrixes()
-                if ans == 3:
-                    # print "volver a empezar"
-                    break
-                elif ans == 2:
-                    band = False
-                    break
+        j = 1
+        # while band:
+            # if j < 5:
+            #     j += 1
+        for i, pi in enumerate(self.requests): 
+            ans = self.get_resources(pi, i)
+            self.print_matrixes()
+            if ans == 3:
+                print "volver a empezar"
+                break
+            elif ans == 2:
+                print "estadop seguro"
+                band = False
+                break
         print "\n\nEstado SEGURO"
 
 
